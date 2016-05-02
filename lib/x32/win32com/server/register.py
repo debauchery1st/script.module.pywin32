@@ -18,7 +18,7 @@ CATID_PythonCOMServer = "{B3EF80D0-68E2-11D0-A689-00C04FD658FF}"
 def _set_subkeys(keyName, valueDict, base=win32con.HKEY_CLASSES_ROOT):
   hkey = win32api.RegCreateKey(base, keyName)
   try:
-    for key, value in valueDict.items():
+    for key, value in valueDict.iteritems():
       win32api.RegSetValueEx(hkey, key, None, win32con.REG_SZ, value)
   finally:
     win32api.RegCloseKey(hkey)
@@ -44,8 +44,7 @@ def _remove_key(path, base=win32con.HKEY_CLASSES_ROOT):
 
   try:
     win32api.RegDeleteKey(base, path)
-  except win32api.error as xxx_todo_changeme1:
-    (code, fn, msg) = xxx_todo_changeme1.args
+  except win32api.error, (code, fn, msg):
     if code != winerror.ERROR_FILE_NOT_FOUND:
       raise win32api.error(code, fn, msg)
 
@@ -56,8 +55,7 @@ def recurse_delete_key(path, base=win32con.HKEY_CLASSES_ROOT):
   """
   try:
     h = win32api.RegOpenKey(base, path)
-  except win32api.error as xxx_todo_changeme2:
-    (code, fn, msg) = xxx_todo_changeme2.args
+  except win32api.error, (code, fn, msg):
     if code != winerror.ERROR_FILE_NOT_FOUND:
       raise win32api.error(code, fn, msg)
   else:
@@ -68,8 +66,7 @@ def recurse_delete_key(path, base=win32con.HKEY_CLASSES_ROOT):
       while 1:
         try:
           subkeyname = win32api.RegEnumKey(h, 0)
-        except win32api.error as xxx_todo_changeme:
-          (code, fn, msg) = xxx_todo_changeme.args
+        except win32api.error, (code, fn, msg):
           if code != winerror.ERROR_NO_MORE_ITEMS:
             raise win32api.error(code, fn, msg)
           break
@@ -287,7 +284,7 @@ def RegisterServer(clsid,
 
   # set up any other reg values they might have
   if other:
-    for key, value in other.items():
+    for key, value in other.iteritems():
       _set_string(keyNameRoot + '\\' + key, value)
 
   if progID:
@@ -432,14 +429,14 @@ def RegisterClasses(*classes, **flags):
                    threadingModel, policySpec, catids, options,
                    addPyComCat, dispatcherSpec, clsctx, addnPath)
     if not quiet:
-      print('Registered:', progID or spec, debuggingDesc)
+      print 'Registered:', progID or spec, debuggingDesc
     # Register the typelibrary
     if tlb_filename:
       tlb_filename = os.path.abspath(tlb_filename)
       typelib = pythoncom.LoadTypeLib(tlb_filename)
       pythoncom.RegisterTypeLib(typelib, tlb_filename)
       if not quiet:
-        print('Registered type library:', tlb_filename)
+        print 'Registered type library:', tlb_filename
   extra = flags.get('finalize_register')
   if extra:
     extra()
@@ -455,19 +452,19 @@ def UnregisterClasses(*classes, **flags):
 
     UnregisterServer(clsid, progID, verProgID, customKeys)
     if not quiet:
-      print('Unregistered:', progID or str(clsid))
+      print 'Unregistered:', progID or str(clsid)
     if unregister_typelib:
       tlb_guid = _get(cls, "_typelib_guid_")
       if tlb_guid is None:
         # I guess I could load the typelib, but they need the GUID anyway.
-        print("Have typelib filename, but no GUID - can't unregister")
+        print "Have typelib filename, but no GUID - can't unregister"
       else:
         major, minor = _get(cls, "_typelib_version_", (1,0))
         lcid = _get(cls, "_typelib_lcid_", 0)
         try:
           pythoncom.UnRegisterTypeLib(tlb_guid, major, minor, lcid)
           if not quiet:
-            print('Unregistered type library')
+            print 'Unregistered type library'
         except pythoncom.com_error:
           pass
 
@@ -499,7 +496,7 @@ def ReExecuteElevated(flags):
   import tempfile
 
   if not flags['quiet']:
-    print("Requesting elevation and retrying...")
+    print "Requesting elevation and retrying..."
   new_params = " ".join(['"' + a + '"' for a in sys.argv])
   # If we aren't already in unattended mode, we want our sub-process to
   # be.
@@ -536,14 +533,14 @@ def ReExecuteElevated(flags):
     batf = open(batfile, "w")
     try:
       cwd = os.getcwd()
-      print("@echo off", file=batf)
+      print >> batf, "@echo off"
       # nothing is 'inherited' by the elevated process, including the
       # environment.  I wonder if we need to set more?
-      print("set PYTHONPATH=%s" % os.environ.get('PYTHONPATH', ''), file=batf)
+      print >> batf, "set PYTHONPATH=%s" % os.environ.get('PYTHONPATH', '')
       # may be on a different drive - select that before attempting to CD.
-      print(os.path.splitdrive(cwd)[0], file=batf)
-      print('cd "%s"' % os.getcwd(), file=batf)
-      print('%s %s > "%s" 2>&1' % (win32api.GetShortPathName(exe_to_run), new_params, outfile), file=batf)
+      print >> batf, os.path.splitdrive(cwd)[0]
+      print >> batf, 'cd "%s"' % os.getcwd()
+      print >> batf, '%s %s > "%s" 2>&1' % (win32api.GetShortPathName(exe_to_run), new_params, outfile)
     finally:
       batf.close()
     executable = os.environ.get('COMSPEC', 'cmd.exe')
@@ -564,16 +561,16 @@ def ReExecuteElevated(flags):
 
     if exit_code:
       # Even if quiet you get to see this message.
-      print("Error: registration failed (exit code %s)." % exit_code)
+      print "Error: registration failed (exit code %s)." % exit_code
     # if we are quiet then the output if likely to already be nearly
     # empty, so always print it.
-    print(output, end=' ')
+    print output,
   finally:
     for f in (outfile, batfile):
       try:
         os.unlink(f)
-      except os.error as exc:
-        print("Failed to remove tempfile '%s': %s" % (f, exc))
+      except os.error, exc:
+        print "Failed to remove tempfile '%s': %s" % (f, exc)
   
 def UseCommandLine(*classes, **flags):
   unregisterInfo = '--unregister_info' in sys.argv
@@ -588,7 +585,7 @@ def UseCommandLine(*classes, **flags):
       UnregisterClasses(*classes, **flags)
     else:
       RegisterClasses(*classes, **flags)
-  except win32api.error as exc:
+  except win32api.error, exc:
     # If we are on xp+ and have "access denied", retry using
     # ShellExecuteEx with 'runas' verb to force elevation (vista) and/or
     # admin login dialog (vista/xp)

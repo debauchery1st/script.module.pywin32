@@ -47,8 +47,7 @@ class ScriptDispatch:
 				try:
 					# xxx - todo - work out what code block to pass???
 					return self.engine.ApplyInScriptedSection(None, func, tuple(realArgs))
-				except COMException as xxx_todo_changeme:
-					(hr, msg, exc, arg) = xxx_todo_changeme.args
+				except COMException, (hr, msg, exc, arg):
 					raise
 
 			except AttributeError:
@@ -62,7 +61,7 @@ class ScriptDispatch:
 					raise AttributeError(name) # Not a property.
 			except AttributeError:
 				raise COMException(scode=winerror.DISP_E_MEMBERNOTFOUND)
-			except COMException as instance:
+			except COMException, instance:
 				raise
 			except:
 				ret = self.engine.HandleException()
