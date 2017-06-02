@@ -7,7 +7,7 @@ import xbmc
 home = xbmc.translatePath("special://home").decode("utf-8")
 package_path = join(home, "addons", "script.module.pywin32")
 
-assert xbmc.getCondVisibility("system.platform.windows")
+# assert xbmc.getCondVisibility("system.platform.windows")
 
 # ARCH = "x%d" % (8 * struct.calcsize("P"))
 ARCH = "x32"
@@ -23,4 +23,5 @@ for lib in LIB_PATHS:
         sys.path.append(lib[0])
         # print("Pywin32: Added '%s'" % lib[1])
 
-imp.load_dynamic("pythoncom", join(package_path, "lib", ARCH, "pywin32_system32", "pythoncom27.dll"))
+# imp.load_dynamic("pythoncom", join(package_path, "lib", ARCH, "pywin32_system32", "pythoncom27.dll"))
+imp.load_dynamic("pythoncom", "pythoncom27.dll")

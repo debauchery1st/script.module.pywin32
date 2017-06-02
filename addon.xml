@@ -9,7 +9,7 @@
   <extension point="xbmc.python.module"
              library="lib" />
   <extension point="xbmc.addon.metadata">
-    <summary>Python for Windows Extensions</summary>
+    <summary>Python for Windows Extensions. Kodi 17.3 compatible build</summary>
     <source>https://github.com/SublimeText/Pywin32</source>
     <platform>windx</platform>
     <license>PSF</license>
