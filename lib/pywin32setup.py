@@ -2,9 +2,10 @@ import sys
 from os.path import join
 # import struct
 import imp
-import xbmc
+# import xbmc
 
-home = xbmc.translatePath("special://home").decode("utf-8")
+# home = xbmc.translatePath("special://home").decode("utf-8")
+home = "C:\\Users\\trevor\\AppData\\Roaming\\Kodi"
 package_path = join(home, "addons", "script.module.pywin32")
 
 # assert xbmc.getCondVisibility("system.platform.windows")
@@ -25,3 +26,4 @@ for lib in LIB_PATHS:
 
 # imp.load_dynamic("pythoncom", join(package_path, "lib", ARCH, "pywin32_system32", "pythoncom27.dll"))
 imp.load_dynamic("pythoncom", "pythoncom27.dll")
+print('hello')
